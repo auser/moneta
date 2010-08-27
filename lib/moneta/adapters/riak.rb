@@ -12,6 +12,7 @@ module Moneta
 
       def initialize(options = {})
         bucket = options.delete(:bucket) || 'cache'
+        @content_type = options.delete(:content_type) || 'application/x-ruby-marshal'
         @cache = ::Riak::Client.new(options)[bucket]
       end
 
@@ -22,7 +23,7 @@ module Moneta
       def [](key)
         begin
           result = @cache.get(key_for(key))
-          result && deserialize(result.data)
+          result && result.data
         rescue ::Riak::FailedRequest => e
           if e.code.to_i == 404
             nil
@@ -41,11 +42,11 @@ module Moneta
 
       def store(key, value, *)
         key  = key_for(key)
-        data = serialize(value)
         obj  = @cache.get_or_new(key)
-        obj.data = data
+        obj.content_type = @content_type
+        obj.data = value
         obj.store
-        data
+        value
       end
 
       def clear
