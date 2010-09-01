@@ -23,20 +23,20 @@ module Moneta
         bucket        = options.delete(:bucket) || 'cache'
         allow_mult    = options.delete(:allow_mult)
         @content_type = options.delete(:content_type) || 'application/x-ruby-marshal'
-        @cache        = ::Riak::Client.new(options)[bucket]
+        @bucket       = ::Riak::Client.new(options)[bucket]
 
-        if !allow_mult.nil? && @cache.allow_mult != allow_mult
-          @cache.allow_mult = allow_mult
+        if !allow_mult.nil? && @bucket.allow_mult != allow_mult
+          @bucket.allow_mult = allow_mult
         end
       end
 
       def key?(key, *)
-        @cache.exists?(key_for(key))
+        @bucket.exists?(key_for(key))
       end
 
       def [](key)
         begin
-          robject = @cache.get(key_for(key))
+          robject = @bucket.get(key_for(key))
           if robject.conflict?
             raise Conflict.new(robject)
           end
@@ -52,13 +52,13 @@ module Moneta
 
       def delete(key, *)
         value = self[key]
-        @cache.delete(key_for(key)) if value
+        @bucket.delete(key_for(key)) if value
         value
       end
 
       def store(key, value, *)
         key  = key_for(key)
-        obj  = @cache.get_or_new(key)
+        obj  = @bucket.get_or_new(key)
         obj.content_type = @content_type
         obj.data = value
         obj.store
@@ -66,8 +66,8 @@ module Moneta
       end
 
       def clear
-        @cache.keys do |keys|
-          keys.each { |key| @cache.delete(key) }
+        @bucket.keys do |keys|
+          keys.each { |key| @bucket.delete(key) }
         end
       end
     end
