@@ -11,6 +11,15 @@ module Moneta
     class Riak
       include Defaults
 
+      class Conflict < StandardError
+        attr_reader :robject
+
+        def initialize(robject)
+          @robject = robject
+          super('Read conflict present')
+        end
+      end
+
       def initialize(options = {})
         bucket = options.delete(:bucket) || 'cache'
         @content_type = options.delete(:content_type) || 'application/x-ruby-marshal'
@@ -23,8 +32,12 @@ module Moneta
 
       def [](key)
         begin
-          result = @cache.get(key_for(key))
-          result && result.data
+          robject = @cache.get(key_for(key))
+          if robject.conflict?
+            raise Conflict.new(robject)
+          end
+
+          robject.data
         rescue ::Riak::FailedRequest => e
           if e.code.to_i == 404
             nil
