@@ -36,7 +36,6 @@ module Moneta
           if robject.conflict?
             raise Conflict.new(robject)
           end
-
           robject.data
         rescue ::Riak::FailedRequest => e
           if e.code.to_i == 404
