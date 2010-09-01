@@ -51,9 +51,8 @@ module Moneta
       end
 
       def delete(key, *)
-        string_key = key_for(key)
         value = self[key]
-        @cache.delete(string_key) if value
+        @cache.delete(key_for(key)) if value
         value
       end
 
