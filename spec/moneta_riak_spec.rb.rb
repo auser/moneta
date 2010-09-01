@@ -12,6 +12,18 @@ begin
     it_should_behave_like "a read/write Moneta cache"
   end
 
+  describe "intializing with allow_mult option" do
+    it "sets to true if true" do
+      Moneta::Adapters::Riak.new(:bucket => 'multifabulous', :allow_mult => true)
+      ::Riak::Client.new['multifabulous'].allow_mult.should be_true
+    end
+
+    it "sets to false if false" do
+      Moneta::Adapters::Riak.new(:bucket => 'multifabulous', :allow_mult => false)
+      ::Riak::Client.new['multifabulous'].allow_mult.should be_false
+    end
+  end
+
   describe "reading key with conflicts" do
     before(:each) do
       client = Riak::Client.new
