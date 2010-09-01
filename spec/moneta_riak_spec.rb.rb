@@ -24,6 +24,28 @@ begin
     end
   end
 
+  describe "setting content type" do
+    before(:each) do
+      @cache = Moneta::Adapters::Riak.new(:content_type => 'application/json')
+      @cache.clear
+      @raw_cache = ::Riak::Client.new['cache']
+    end
+
+    it "serializes on write" do
+      @cache['foo'] = {:foo => 'bar'}
+      @raw_cache['foo'].data.should == {'foo' => 'bar'}
+    end
+
+    it "deserializes on read" do
+      obj = @raw_cache.get_or_new('foo')
+      obj.content_type = 'application/json'
+      obj.data = {'foo' => 'bar'}
+      obj.store
+
+      @cache['foo'] = {'foo' => 'bar'}
+    end
+  end
+
   describe "reading key with conflicts" do
     before(:each) do
       client = Riak::Client.new
