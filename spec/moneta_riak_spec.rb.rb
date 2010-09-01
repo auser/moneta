@@ -18,6 +18,18 @@ begin
       ::Riak::Client.new['multifabulous'].allow_mult.should be_true
     end
 
+    it "does not set allow_mult if already correct" do
+      client = ::Riak::Client.new
+      bucket = client['multifabulous']
+      bucket.allow_mult = true
+
+      ::Riak::Client.should_receive(:new).and_return(client)
+      client.should_receive(:[]).and_return(bucket)
+      bucket.should_not_receive(:allow_mult=)
+
+      Moneta::Adapters::Riak.new(:bucket => 'multifabulous', :allow_mult => true)
+    end
+
     it "sets to false if false" do
       Moneta::Adapters::Riak.new(:bucket => 'multifabulous', :allow_mult => false)
       ::Riak::Client.new['multifabulous'].allow_mult.should be_false
