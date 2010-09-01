@@ -27,7 +27,7 @@ module Moneta
       end
 
       def key?(key, *)
-        !!self[key]
+        @cache.exists?(key_for(key))
       end
 
       def [](key)
