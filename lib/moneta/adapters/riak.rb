@@ -1,8 +1,7 @@
 begin
   require "riak"
 rescue LoadError
-  puts "You need the riak-client gem (>= 0.8) to use the Riak store. \
-          If 0.8 is not released yet, gem install riak-client --pre to get it."
+  puts "You need the riak-client gem (>= 0.8) to use the Riak store."
   exit
 end
 
