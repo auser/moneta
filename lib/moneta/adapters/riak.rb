@@ -19,13 +19,14 @@ module Moneta
         end
       end
 
-      def initialize(options = {})
+      def initialize(options={})
         bucket        = options.delete(:bucket) || 'cache'
-        allow_mult    = options.delete(:allow_mult)
+        allow_mult    = options.delete(:allow_mult) || false
         @content_type = options.delete(:content_type) || 'application/x-ruby-marshal'
-        @bucket       = ::Riak::Client.new(options)[bucket]
+        @client       = ::Riak::Client.new(options)
+        @bucket       = @client[bucket]
 
-        if !allow_mult.nil? && @bucket.allow_mult != allow_mult
+        if @bucket.allow_mult != allow_mult
           @bucket.allow_mult = allow_mult
         end
       end
