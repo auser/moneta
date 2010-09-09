@@ -19,6 +19,8 @@ module Moneta
         end
       end
 
+      attr_reader :bucket
+
       def initialize(options={})
         bucket        = options.delete(:bucket) || 'cache'
         allow_mult    = options.delete(:allow_mult) || false

@@ -10,6 +10,11 @@ begin
     end
 
     it_should_behave_like "a read/write Moneta cache"
+    
+    it "has bucket reader for when you need the metal" do
+      @cache.bucket.should be_instance_of(Riak::Bucket)
+      @cache.bucket.name.should == 'cache'
+    end
   end
 
   describe "intializing with allow_mult option" do
